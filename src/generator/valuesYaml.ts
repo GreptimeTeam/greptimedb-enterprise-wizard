@@ -350,10 +350,15 @@ export function generateValuesYaml(config: AppConfig): string {
     // Standalone storage
     const standaloneLines: string[] = []
     const mon = config.monitoringObservability.monitoring
+    const baseLines: string[] = [
+      `imagePullSecrets:\n  - name: ${yamlString('greptimedb-custom-image-pull-secret')}`,
+    ]
 
     if (mon.resources.cpu || mon.resources.memory) {
-      standaloneLines.push(`base:\n  main:\n    resources:\n      requests:\n        cpu: ${yamlString(mon.resources.cpu)}\n        memory: ${yamlString(mon.resources.memory)}\n      limits:\n        cpu: ${yamlString(mon.resources.cpu)}\n        memory: ${yamlString(mon.resources.memory)}`)
+      baseLines.push(`main:\n  resources:\n    requests:\n      cpu: ${yamlString(mon.resources.cpu)}\n      memory: ${yamlString(mon.resources.memory)}\n    limits:\n      cpu: ${yamlString(mon.resources.cpu)}\n      memory: ${yamlString(mon.resources.memory)}`)
     }
+
+    standaloneLines.push(`base:\n${indent(baseLines.join('\n'), 1)}`)
 
     // Object storage
     if (mon.objectStorage.type !== 'none') {

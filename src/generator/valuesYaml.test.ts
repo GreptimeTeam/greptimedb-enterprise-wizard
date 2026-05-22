@@ -134,6 +134,17 @@ describe('generateValuesYaml', () => {
     })
   })
 
+  it('emits monitoring standalone image pull secret', async () => {
+    const config = await createConfig()
+    config.monitoringObservability.monitoring.enabled = true
+
+    const values = await generate(config)
+
+    expect(values.monitoring.standalone.base.imagePullSecrets).toEqual([
+      { name: 'greptimedb-custom-image-pull-secret' },
+    ])
+  })
+
   it('emits required cache file-storage fields', async () => {
     const config = await createConfig()
     config.objectStorage.type = 's3'
